@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock del Económico</title>
+    <!-- Tailwind CSS para el diseño premium y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuente Inter para una tipografía ultra limpia -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-600 text-white p-2.5 rounded-xl shadow-md shadow-emerald-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">Stock del <span class="text-emerald-500 font-extrabold">Económico</span></h1>
+                    <p class="text-xs text-slate-500">Gestión de stock en almacenamiento local de alta velocidad</p>
+                </div>
+            </div>
+            
+            <!-- Badges e Indicadores de Estado -->
+            <div class="flex items-center gap-2 flex-wrap justify-center">
+                <!-- Visualizador de la fecha actual del sistema -->
+                <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Hoy:</span>
+                    <span id="current-date-badge">22 de Mayo, 2026</span>
+                </div>
+
+                <!-- Indicador de Almacenamiento Local Seguro -->
+                <div id="storage-status-badge" class="flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 text-xs font-semibold text-emerald-700 shadow-sm">
+                    <svg class="w-4 h-4 text-emerald-600" id="storage-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span id="storage-status-text">Guardado en Dispositivo (Local)</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+        <!-- Contenedor flotante para notificaciones emergentes (toasts) -->
+        <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none"></div>
+
+        <!-- Banner de estadísticas dinámicas basadas en semáforos temporales -->
+        <section class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+            <!-- Tarjeta de productos seguros (más de 3 semanas) -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Seguros</p>
+                    <h3 id="stat-safe" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="bg-emerald-50 text-emerald-600 p-2 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
+            <!-- Tarjeta de alerta azul (menos de 3 semanas restantes) -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">3 Semanas</p>
+                    <h3 id="stat-notice" class="text-2xl font-bold text-blue-600 mt-1">0</h3>
+                </div>
+                <div class="bg-blue-50 text-blue-600 p-2 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
+            <!-- Tarjeta de alerta amarilla (menos de 1 semana restante) -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">1 Semana</p>
+                    <h3 id="stat-warning" class="text-2xl font-bold text-amber-500 mt-1">0</h3>
+                </div>
+                <div class="bg-amber-50 text-amber-600 p-2 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+            </div>
+            <!-- Tarjeta de alerta roja (vencidos / a cambiar) -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Vencidos</p>
+                    <h3 id="stat-expired" class="text-2xl font-bold text-rose-600 mt-1">0</h3>
+                </div>
+                <div class="bg-rose-50 text-rose-600 p-2 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
+            <!-- Historial de cambios realizados (completados) -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between col-span-2 lg:col-span-1">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Cambiados</p>
+                    <h3 id="stat-completed" class="text-2xl font-bold text-slate-500 mt-1">0</h3>
+                </div>
+                <div class="bg-slate-100 text-slate-600 p-2 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- COLUMNA IZQUIERDA: Formularios de carga e importación (4 columnas de ancho) -->
+            <section class="lg:col-span-4 flex flex-col gap-6">
+                
+                <!-- Carga Masiva: Área de copiado y pegado inteligente -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V4a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                        <h2 class="text-lg font-bold text-slate-900">Pegar Lista de Artículos</h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Pega tu listado de productos con su fecha en cualquier formato (ej: <code class="bg-slate-100 px-1 py-0.5 rounded text-emerald-600 font-semibold">16-05</code>, <code class="bg-slate-100 px-1 py-0.5 rounded text-emerald-600 font-semibold">18/06/27</code>, <code class="bg-slate-100 px-1 py-0.5 rounded text-emerald-600 font-semibold">12 10 27</code>). El algoritmo procesará la información al instante.</p>
+                    
+                    <textarea id="paste-area" rows="8" class="w-full text-sm p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50 placeholder-slate-400 font-mono resize-y" placeholder="Ejemplo:&#10;Balla Bon o bon - 16-05&#10;Charge - 18-06&#10;Toblerone grande - 21-05&#10;Mini Crochissima Levantate Salado - 11-05-26"></textarea>
+                    
+                    <button id="btn-parse" class="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-sm shadow-emerald-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <span>Procesar y Agregar</span>
+                    </button>
+                </div>
+
+                <!-- Carga Manual: Agregar producto individual -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h2 class="text-lg font-bold text-slate-900">Agregar Manual</h2>
+                    </div>
+                    
+                    <form id="manual-form" class="space-y-3">
+                        <div>
+                            <label for="manual-name" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Nombre del artículo</label>
+                            <input type="text" id="manual-name" required class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50" placeholder="Ej: Alfajor Milka">
+                        </div>
+                        <div>
+                            <label for="manual-date" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Fecha de vencimiento</label>
+                            <input type="date" id="manual-date" required class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50">
+                        </div>
+                        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2">
+                            <span>Añadir Producto</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Respaldo de Datos: Copias de seguridad locales -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        <h2 class="text-lg font-bold text-slate-900">Respaldos locales</h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Exporta todo el stock del dispositivo a un archivo de texto o carga un respaldo anterior para sumar nuevos artículos sin sobreescribir los actuales.</p>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Botón Descargar -->
+                        <button id="btn-download" class="flex flex-col items-center justify-center p-3 border border-emerald-200 hover:border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 rounded-xl transition cursor-pointer gap-1.5 text-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            <span class="text-xs font-bold">Descargar (.txt)</span>
+                        </button>
+                        
+                        <!-- Botón Cargar -->
+                        <label for="upload-file" class="flex flex-col items-center justify-center p-3 border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition cursor-pointer gap-1.5 text-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            <span class="text-xs font-bold">Cargar (.txt)</span>
+                            <input type="file" id="upload-file" accept=".txt" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- COLUMNA DERECHA: Visualización principal y filtros avanzados (8 columnas de ancho) -->
+            <section class="lg:col-span-8 flex flex-col gap-4">
+                
+                <!-- Buscador de artículos y pestañas de filtro semáforo -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col gap-4">
+                    
+                    <!-- Barra de Entrada de búsqueda -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <input type="text" id="search-input" class="w-full text-sm pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50 placeholder-slate-400" placeholder="Buscar artículo por nombre...">
+                        <!-- Botón para limpiar búsqueda -->
+                        <button id="btn-clear-search" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Pestañas de Filtrado Solicitadas -->
+                    <div class="border-t border-slate-100 pt-3">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-2 tracking-wider">Filtrar visualización:</label>
+                        <div class="flex flex-wrap gap-2">
+                            <!-- Botón TODO (Activos, sin mostrar vencidos) -->
+                            <button id="filter-todo" class="filter-btn active px-4 py-2 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-1.5 bg-emerald-600 text-white" onclick="changeFilter('todo')">
+                                <span>Todo (Activos)</span>
+                                <span class="badge bg-emerald-800 text-emerald-100 rounded-full px-1.5 py-0.5 text-[10px]" id="count-todo">0</span>
+                            </button>
+                            <!-- Botón A 3 SEMANAS (Tarjetas azules) -->
+                            <button id="filter-3weeks" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200" onclick="changeFilter('3-weeks')">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                <span>A 3 Semanas</span>
+                                <span class="badge bg-slate-300 text-slate-700 rounded-full px-1.5 py-0.5 text-[10px]" id="count-3weeks">0</span>
+                            </button>
+                            <!-- Botón A 1 SEMANA (Tarjetas amarillas) -->
+                            <button id="filter-1week" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200" onclick="changeFilter('1-week')">
+                                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                <span>A 1 Semana</span>
+                                <span class="badge bg-slate-300 text-slate-700 rounded-full px-1.5 py-0.5 text-[10px]" id="count-1week">0</span>
+                            </button>
+                            <!-- Botón A CAMBIAR (Tarjetas Rojas / Vencidas) -->
+                            <button id="filter-expired" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200" onclick="changeFilter('expired')">
+                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                                <span>A Cambiar (Vencidos)</span>
+                                <span class="badge bg-slate-300 text-slate-700 rounded-full px-1.5 py-0.5 text-[10px]" id="count-expired">0</span>
+                            </button>
+                            <!-- Botón HISTORIAL DE CAMBIOS REALIZADOS -->
+                            <button id="filter-historial" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200" onclick="changeFilter('historial')">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span>Cambios Realizados</span>
+                                <span class="badge bg-slate-300 text-slate-700 rounded-full px-1.5 py-0.5 text-[10px]" id="count-historial">0</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Cabecera de la sección de lista y botón de borrado masivo -->
+                <div class="flex items-center justify-between px-2">
+                    <h3 id="list-title" class="text-sm font-bold text-slate-500 uppercase tracking-wider">Productos en Lista</h3>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-clear-all" class="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:underline flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Borrar todo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Rejilla dinámica de tarjetas -->
+                <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Las tarjetas de stock se cargarán aquí programáticamente -->
+                </div>
+
+                <!-- Estado Vacío cuando no hay resultados en la búsqueda o lista -->
+                <div id="empty-state" class="hidden bg-white p-12 rounded-xl border border-slate-200 text-center shadow-xs flex flex-col items-center justify-center">
+                    <div class="bg-emerald-50 text-emerald-500 p-4 rounded-full mb-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6"></path></svg>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-800">No hay artículos que mostrar</h4>
+                    <p class="text-sm text-slate-500 mt-1 max-w-sm">No encontramos productos en esta categoría o tu búsqueda no arrojó resultados. ¡Carga o escribe nuevos artículos en el panel izquierdo!</p>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Pie de página corporativo -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-400">
+        <p>&copy; 2026 Stock del Económico. Almacenamiento local optimizado y autónomo.</p>
+    </footer>
+
+    <!-- MODAL DE EDICIÓN DE PRODUCTO -->
+    <div id="edit-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden transform scale-95 transition-transform duration-200">
+            <!-- Encabezado del Modal -->
+            <div class="px-6 py-4 bg-emerald-600 text-white flex justify-between items-center">
+                <h3 class="text-lg font-bold">Editar Producto</h3>
+                <button onclick="closeEditModal()" class="text-emerald-100 hover:text-white transition cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Cuerpo y Formulario del Modal -->
+            <form id="edit-form" class="p-6 space-y-4">
+                <input type="hidden" id="edit-id">
+                <div>
+                    <label for="edit-name" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Nombre del artículo</label>
+                    <input type="text" id="edit-name" required class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50">
+                </div>
+                <div>
+                    <label for="edit-date" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Fecha de vencimiento</label>
+                    <input type="date" id="edit-date" required class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50">
+                </div>
+                
+                <div class="flex gap-3 justify-end pt-2">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-700 font-semibold text-sm transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm transition shadow-md shadow-emerald-100">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA LOCAL DE LA APLICACIÓN -->
+    <script>
+        // Configuración de la fecha del sistema con la fecha actual del usuario
+        const SYSTEM_TODAY = new Date();
+        document.getElementById('current-date-badge').innerText = formatLocalDate(SYSTEM_TODAY);
+
+        // Estado principal en memoria
+        let state = {
+            products: [],
+            currentFilter: 'todo', // 'todo' | '3-weeks' | '1-week' | 'expired' | 'historial'
+            searchQuery: ''
+        };
+
+        // Listado de ejemplo original para precargar en caso de que esté vacío
+        const DEMO_LIST_TEXT = `Balla Bon o bon - 16-05
+Charge - 18-06
+Toblerone grande - 21-05
+Geotche (bombones) - 14-06
+Alfajor Terrabussi - 13-05
+Mini Crochissima Levantate Salado - 11-05-26
+Chokito - 07-06-26
+Bon Bon mini alfajor ×6 - 20-16-26
+Chocolate Cofler 60% Almendras - 28-16-26
+Dos Melte - 27-15-05
+Bombones Lata - 04-06
+Sofía Alfajores - 20-15
+Cofler Blanco c/chocolinas 55g - 27-15
+Alfajores Portezuelo 45g granizado - 14-16
+Alfajores Portezuelo 40g pique - 23-16
+Alfajores Portezuelo 75g blk triple - 26-16
+Alfajores Portezuelo 60g blk blanco - 21-16
+Alfajores Portezuelo 60g blk negro - 10-16
+Alfajores Portezuelo 38g choco - 16-16
+Bonafito ×6 choco blanco 45g - 30-16
+Juana la Loca salchichón - 03-16
+Juana la Loca salchichón merengue - 26-15-26`;
+
+        window.onload = function() {
+            initLocalStorageData();
+            setupEventListeners();
+        };
+
+        // Lee la información guardada en LocalStorage al iniciar la página
+        function initLocalStorageData() {
+            try {
+                const rawData = localStorage.getItem('stock_economico_products');
+                if (rawData) {
+                    state.products = JSON.parse(rawData);
+                    showToast("Base de datos local cargada con éxito.", "success");
+                } else {
+                    // Si el dispositivo está vacío, cargamos los datos demostrativos por primera vez
+                    parseAndAppendTextList(DEMO_LIST_TEXT, false);
+                    saveToLocalStorage();
+                    showToast("Bienvenido. Se ha precargado la lista de demostración.", "info");
+                }
+                render();
+            } catch (error) {
+                console.error("Error al acceder al localStorage:", error);
+                showToast("Hubo un error al intentar acceder a la memoria de tu dispositivo.", "error");
+            }
+        }
+
+        // Guarda el estado actual de los productos en localStorage de manera persistente
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('stock_economico_products', JSON.stringify(state.products));
+            } catch (e) {
+                console.error("Error de almacenamiento local:", e);
+                showToast("No se pudo escribir en el disco del dispositivo. Es posible que el almacenamiento esté lleno.", "error");
+            }
+        }
+
+        // Parsea y procesa una lista completa separada por saltos de línea
+        function parseAndAppendTextList(text, notify = true) {
+            const lines = text.split('\n');
+            let addedCount = 0;
+            
+            lines.forEach(line => {
+                const parsed = parseSingleLine(line);
+                if (parsed) {
+                    state.products.push(parsed);
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                saveToLocalStorage();
+                render();
+                if (notify) {
+                    showToast(`Se agregaron y guardaron ${addedCount} productos de forma local.`, "success");
+                }
+            } else if (notify) {
+                showToast("No se pudo extraer ningún producto válido.", "warning");
+            }
+        }
+
+        // Intenta decodificar el nombre de un artículo y su fecha con expresiones regulares
+        function parseSingleLine(line) {
+            line = line.trim();
+            if (!line) return null;
+
+            // Expresión regular robusta para detectar fechas (separadas por guiones, espacios, diagonales o cruz de multiplicación)
+            const dateRegex = /(\d{1,2})[\s\-\/\.×]+(\d{1,2})(?:[\s\-\/\.×]+(\d{2,4}))?\s*$/;
+            const match = line.match(dateRegex);
+
+            let name = line;
+            let parsedDate = null;
+            let needsVerification = false;
+
+            if (match) {
+                // Separamos el nombre del producto limpiando cualquier carácter basura al final
+                name = line.substring(0, match.index).trim();
+                name = name.replace(/[\s\-\/\×\.\,]+$/, '').trim();
+
+                let day = parseInt(match[1], 10);
+                let month = parseInt(match[2], 10);
+                let year = match[3] ? parseInt(match[3], 10) : SYSTEM_TODAY.getFullYear();
+
+                // Normalización si el año tiene solo 2 dígitos (ej: 26 -> 2026)
+                if (match[3] && match[3].length === 2) {
+                    year = 2000 + year;
+                }
+
+                // Corrige automáticamente meses fuera de rango (como meses 15 o 16 del listado original)
+                if (month > 12) {
+                    month = 12; // Se limita al último mes
+                    needsVerification = true;
+                }
+                if (month < 1) month = 1;
+
+                // Corrige días excedentes según el mes correspondiente
+                const daysInMonth = new Date(year, month, 0).getDate();
+                if (day > daysInMonth) {
+                    day = daysInMonth;
+                    needsVerification = true;
+                }
+
+                parsedDate = new Date(year, month - 1, day);
+            } else {
+                // Fallback por si no detecta fecha: le suma por defecto 30 días a partir de hoy
+                parsedDate = new Date(SYSTEM_TODAY);
+                parsedDate.setDate(parsedDate.getDate() + 30);
+                needsVerification = true;
+            }
+
+            return {
+                id: 'prod_' + Math.random().toString(36).substr(2, 9),
+                name: name || "Producto sin nombre",
+                expiryDate: parsedDate.toISOString().split('T')[0],
+                needsVerification: needsVerification,
+                originalText: line,
+                status: 'active', // 'active' | 'completed'
+                completedAt: null
+            };
+        }
+
+        // Devuelve cuántos días de vigencia le quedan al producto
+        function getRemainingDays(expiryDateStr) {
+            const today = new Date(SYSTEM_TODAY);
+            today.setHours(0,0,0,0);
+            const expiry = new Date(expiryDateStr + 'T00:00:00');
+            expiry.setHours(0,0,0,0);
+
+            const diffTime = expiry - today;
+            return Math.round(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        // Categoriza el estado semáforo según la fecha de vencimiento
+        function getItemStatusCategory(expiryDateStr) {
+            const days = getRemainingDays(expiryDateStr);
+            if (days <= 0) {
+                return 'expired'; // Tarjeta Roja (Vencido)
+            } else if (days <= 7) {
+                return 'warning'; // Tarjeta Amarilla (Menos de 1 semana)
+            } else if (days <= 21) {
+                return 'notice';  // Tarjeta Azul (Menos de 3 semanas)
+            } else {
+                return 'safe';    // Seguro (Blanco/Gris)
+            }
+        }
+
+        // Redibuja toda la vista leyendo la memoria actual
+        function render() {
+            const grid = document.getElementById('cards-grid');
+            const emptyState = document.getElementById('empty-state');
+            grid.innerHTML = '';
+
+            let safeCount = 0;
+            let noticeCount = 0;
+            let warningCount = 0;
+            let expiredCount = 0;
+            let completedCount = 0;
+            let activeNonExpiredCount = 0;
+
+            state.products.forEach(prod => {
+                if (prod.status === 'completed') {
+                    completedCount++;
+                } else {
+                    const cat = getItemStatusCategory(prod.expiryDate);
+                    if (cat === 'expired') expiredCount++;
+                    else if (cat === 'warning') warningCount++;
+                    else if (cat === 'notice') noticeCount++;
+                    else safeCount++;
+
+                    // "Todo" solo incluye artículos no vencidos
+                    if (cat !== 'expired') {
+                        activeNonExpiredCount++;
+                    }
+                }
+            });
+
+            // Actualizando los números de las tarjetas de estadísticas principales
+            document.getElementById('stat-safe').innerText = safeCount;
+            document.getElementById('stat-notice').innerText = noticeCount;
+            document.getElementById('stat-warning').innerText = warningCount;
+            document.getElementById('stat-expired').innerText = expiredCount;
+            document.getElementById('stat-completed').innerText = completedCount;
+
+            // Actualizando los contadores internos de los botones de filtro
+            document.getElementById('count-todo').innerText = activeNonExpiredCount;
+            document.getElementById('count-3weeks').innerText = noticeCount;
+            document.getElementById('count-1week').innerText = warningCount;
+            document.getElementById('count-expired').innerText = expiredCount;
+            document.getElementById('count-historial').innerText = completedCount;
+
+            // Filtra la lista según búsqueda y pestaña seleccionada
+            const filtered = state.products.filter(prod => {
+                const matchesSearch = prod.name.toLowerCase().includes(state.searchQuery.toLowerCase());
+                if (!matchesSearch) return false;
+
+                if (state.currentFilter === 'todo') {
+                    return prod.status === 'active' && getItemStatusCategory(prod.expiryDate) !== 'expired';
+                }
+                if (state.currentFilter === '3-weeks') {
+                    return prod.status === 'active' && getItemStatusCategory(prod.expiryDate) === 'notice';
+                }
+                if (state.currentFilter === '1-week') {
+                    return prod.status === 'active' && getItemStatusCategory(prod.expiryDate) === 'warning';
+                }
+                if (state.currentFilter === 'expired') {
+                    return prod.status === 'active' && getItemStatusCategory(prod.expiryDate) === 'expired';
+                }
+                if (state.currentFilter === 'historial') {
+                    return prod.status === 'completed';
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                // Ordenamiento lógico: los más cercanos a vencer primero, historial por fecha de finalización
+                filtered.sort((a, b) => {
+                    if (a.status === 'completed' && b.status === 'completed') {
+                        return new Date(b.completedAt) - new Date(a.completedAt);
+                    }
+                    return new Date(a.expiryDate) - new Date(b.expiryDate);
+                });
+
+                filtered.forEach(prod => {
+                    grid.appendChild(createProductCard(prod));
+                });
+            }
+
+            // Ocultar o mostrar el botón para limpiar búsqueda
+            const clearSearchBtn = document.getElementById('btn-clear-search');
+            if (state.searchQuery) {
+                clearSearchBtn.classList.remove('hidden');
+            } else {
+                clearSearchBtn.classList.add('hidden');
+            }
+        }
+
+        // Crea el elemento DOM de una tarjeta de producto
+        function createProductCard(prod) {
+            const card = document.createElement('div');
+            card.className = "flex flex-col justify-between p-4 rounded-xl border transition-all duration-200 shadow-xs hover:shadow-md ";
+
+            const daysLeft = getRemainingDays(prod.expiryDate);
+            const formattedDate = prod.expiryDate.split('-').reverse().join('/');
+
+            let colorThemeClass = "";
+            let badgeHTML = "";
+            let buttonHTML = "";
+
+            if (prod.status === 'completed') {
+                // Estilo para el historial
+                colorThemeClass = "bg-slate-50 border-slate-200 text-slate-500";
+                badgeHTML = `
+                    <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Cambio Realizado
+                    </span>
+                `;
+                buttonHTML = `
+                    <button onclick="restoreItem('${prod.id}')" class="text-xs font-semibold text-emerald-700 hover:text-emerald-950 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition">
+                        <span>Reactivar</span>
+                    </button>
+                    <button onclick="deleteItem('${prod.id}')" class="text-xs font-semibold text-rose-600 hover:text-rose-800 flex items-center gap-1 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition ml-auto">
+                        <span>Eliminar</span>
+                    </button>
+                `;
+            } else {
+                const category = getItemStatusCategory(prod.expiryDate);
+
+                if (category === 'expired') {
+                    // Semáforo Rojo (Vencido)
+                    colorThemeClass = "bg-rose-50 border-rose-200 text-rose-950";
+                    badgeHTML = `
+                        <span class="inline-flex items-center gap-1 bg-rose-200 text-rose-900 text-xs font-bold px-2.5 py-0.5 rounded-full animate-pulse">
+                            Vencido (${Math.abs(daysLeft)}d)
+                        </span>
+                    `;
+                    buttonHTML = `
+                        <button onclick="completeChange('${prod.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-100 text-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                            <span>Cambió Realizado</span>
+                        </button>
+                    `;
+                } else if (category === 'warning') {
+                    // Semáforo Amarillo (Menos de 1 semana)
+                    colorThemeClass = "bg-amber-50/60 border-amber-200 text-amber-950";
+                    badgeHTML = `
+                        <span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                            Restan ${daysLeft} días
+                        </span>
+                    `;
+                } else if (category === 'notice') {
+                    // Semáforo Azul (Menos de 3 semanas)
+                    colorThemeClass = "bg-blue-50/60 border-blue-200 text-blue-950";
+                    badgeHTML = `
+                        <span class="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                            Restan ${daysLeft} días
+                        </span>
+                    `;
+                } else {
+                    // Estado Normal / Seguro (Gris neutro)
+                    colorThemeClass = "bg-white border-slate-200 text-slate-800";
+                    badgeHTML = `
+                        <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                            Restan ${daysLeft} días
+                        </span>
+                    `;
+                }
+            }
+
+            card.className += colorThemeClass;
+
+            let cardContentHTML = `
+                <div>
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-sm leading-snug break-words tracking-tight ${prod.status === 'completed' ? 'line-through text-slate-400' : ''}">${escapeHTML(prod.name)}</h4>
+                        </div>
+                        <div class="flex flex-col items-end gap-1 shrink-0">
+                            ${badgeHTML}
+                            ${prod.needsVerification && prod.status === 'active' ? `
+                                <span class="text-[10px] font-medium bg-purple-100 text-purple-700 px-2 py-0.2 rounded-full border border-purple-200 animate-pulse" title="La fecha contenía meses o días fuera de rango, se corrigió automáticamente.">
+                                    Revisar fecha
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <div class="text-xs space-y-1 text-slate-500 mb-4">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span>Vence: <strong class="text-slate-700">${formattedDate}</strong></span>
+                        </div>
+                        ${prod.completedAt ? `
+                            <div class="flex items-center gap-1 text-emerald-600">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Cambiado el: ${new Date(prod.completedAt).toLocaleDateString('es-ES')}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            let cardActionArea = "";
+            if (prod.status === 'active') {
+                cardActionArea = `
+                    <div class="border-t border-slate-100 pt-3 flex items-center justify-between gap-2">
+                        <div class="flex gap-1.5 w-full">
+                            <!-- Botón Editar -->
+                            <button onclick="openEditModal('${prod.id}')" class="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-700 rounded-lg transition" title="Editar artículo">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+                            <!-- Botón Eliminar -->
+                            <button onclick="deleteItem('${prod.id}')" class="p-1.5 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg transition" title="Eliminar artículo">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                            <div class="flex-1">
+                                ${buttonHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                cardActionArea = `
+                    <div class="border-t border-slate-100 pt-3 flex items-center gap-2">
+                        ${buttonHTML}
+                    </div>
+                `;
+            }
+
+            card.innerHTML = cardContentHTML + cardActionArea;
+            return card;
+        }
+
+        function setupEventListeners() {
+            // Cargar listado de texto masivo
+            document.getElementById('btn-parse').addEventListener('click', () => {
+                const text = document.getElementById('paste-area').value;
+                if (!text.trim()) {
+                    showToast("Por favor pega un listado válido antes de procesar.", "warning");
+                    return;
+                }
+                parseAndAppendTextList(text, true);
+                document.getElementById('paste-area').value = ""; // Limpiar text area
+            });
+
+            // Enviar formulario de carga manual
+            document.getElementById('manual-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nameInput = document.getElementById('manual-name');
+                const dateInput = document.getElementById('manual-date');
+
+                const newProd = {
+                    id: 'prod_' + Math.random().toString(36).substr(2, 9),
+                    name: nameInput.value.trim(),
+                    expiryDate: dateInput.value,
+                    needsVerification: false,
+                    originalText: `${nameInput.value.trim()} - ${dateInput.value}`,
+                    status: 'active',
+                    completedAt: null
+                };
+
+                state.products.push(newProd);
+                saveToLocalStorage();
+                render();
+
+                showToast(`"${newProd.name}" se guardó en el dispositivo.`, "success");
+                
+                nameInput.value = "";
+                dateInput.value = "";
+            });
+
+            // Input del buscador
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                render();
+            });
+
+            // Botón de limpiar buscador
+            document.getElementById('btn-clear-search').addEventListener('click', () => {
+                document.getElementById('search-input').value = "";
+                state.searchQuery = "";
+                render();
+            });
+
+            // Botón descargar respaldo local
+            document.getElementById('btn-download').addEventListener('click', () => {
+                downloadLocalBackup();
+            });
+
+            // Cargar respaldo desde archivo
+            document.getElementById('upload-file').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    processImportContent(evt.target.result);
+                };
+                reader.readAsText(file);
+                e.target.value = ""; // Limpiar input para permitir relanzar el mismo archivo
+            });
+
+            // Guardar cambios al editar
+            document.getElementById('edit-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('edit-id').value;
+                const updatedName = document.getElementById('edit-name').value;
+                const updatedDate = document.getElementById('edit-date').value;
+
+                const prodIndex = state.products.findIndex(p => p.id === id);
+                if (prodIndex > -1) {
+                    state.products[prodIndex].name = updatedName;
+                    state.products[prodIndex].expiryDate = updatedDate;
+                    state.products[prodIndex].needsVerification = false; // Validado por el usuario
+                    
+                    saveToLocalStorage();
+                    render();
+                    showToast("Producto actualizado en el dispositivo.", "success");
+                    closeEditModal();
+                }
+            });
+
+            // Borrado masivo completo
+            document.getElementById('btn-clear-all').addEventListener('click', () => {
+                showActionConfirmToast(
+                    "¿Estás seguro de que deseas borrar por completo el stock guardado en tu dispositivo?",
+                    () => {
+                        state.products = [];
+                        saveToLocalStorage();
+                        render();
+                        showToast("Se vació toda la memoria local de la aplicación.", "info");
+                    }
+                );
+            });
+        }
+
+        // Marca un producto vencido como cambiado, pasándolo al historial
+        function completeChange(id) {
+            const index = state.products.findIndex(p => p.id === id);
+            if (index > -1) {
+                state.products[index].status = 'completed';
+                state.products[index].completedAt = new Date().toISOString();
+                saveToLocalStorage();
+                render();
+                showToast(`"${state.products[index].name}" se movió al historial de cambios realizados.`, "success");
+            }
+        }
+
+        // Restaura un producto del historial de cambios de vuelta a la lista activa
+        function restoreItem(id) {
+            const index = state.products.findIndex(p => p.id === id);
+            if (index > -1) {
+                state.products[index].status = 'active';
+                state.products[index].completedAt = null;
+                saveToLocalStorage();
+                render();
+                showToast(`"${state.products[index].name}" ha sido reactivado en la lista.`, "info");
+            }
+        }
+
+        // Elimina permanentemente un producto de la base de datos local
+        function deleteItem(id) {
+            const index = state.products.findIndex(p => p.id === id);
+            if (index > -1) {
+                const name = state.products[index].name;
+                state.products = state.products.filter(p => p.id !== id);
+                saveToLocalStorage();
+                render();
+                showToast(`Se eliminó permanentemente "${name}".`, "info");
+            }
+        }
+
+        // Modifica la pestaña activa de filtrado y cambia los estilos de los botones
+        function changeFilter(filterName) {
+            state.currentFilter = filterName;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = "filter-btn px-4 py-2 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200";
+            });
+
+            const targetBtnId = `filter-${filterName === '3-weeks' ? '3weeks' : filterName === '1-week' ? '1week' : filterName}`;
+            const activeBtn = document.getElementById(targetBtnId);
+            
+            if (activeBtn) {
+                activeBtn.className = `filter-btn active px-4 py-2 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-1.5 ${
+                    filterName === 'todo' ? 'bg-emerald-600 text-white shadow-sm' : 
+                    filterName === '3-weeks' ? 'bg-blue-600 text-white' : 
+                    filterName === '1-week' ? 'bg-amber-500 text-white' : 
+                    filterName === 'expired' ? 'bg-rose-600 text-white' : 'bg-slate-800 text-white'
+                }`;
+                
+                const innerBadge = activeBtn.querySelector('.badge');
+                if (innerBadge) {
+                    innerBadge.className = "badge bg-white/25 text-white rounded-full px-1.5 py-0.5 text-[10px]";
+                }
+            }
+
+            const titleEl = document.getElementById('list-title');
+            if (filterName === 'todo') titleEl.innerText = "Artículos Activos (Excluyendo Vencidos)";
+            else if (filterName === '3-weeks') titleEl.innerText = "Alerta Azul: Próximos 21 días";
+            else if (filterName === '1-week') titleEl.innerText = "Alerta Amarilla: Próximos 7 días";
+            else if (filterName === 'expired') titleEl.innerText = "Alerta Roja: Vencidos (A Cambiar)";
+            else if (filterName === 'historial') titleEl.innerText = "Historial de Cambios Realizados";
+
+            render();
+        }
+
+        // Genera un archivo de texto seguro del progreso actual para su descarga
+        function downloadLocalBackup() {
+            try {
+                const backupObject = {
+                    version: "stock_economico_local_v2",
+                    savedAt: new Date().toISOString(),
+                    products: state.products
+                };
+                
+                const dataString = JSON.stringify(backupObject, null, 2);
+                const blob = new Blob([dataString], { type: 'text/plain;charset=utf-8' });
+                const fileName = `backup_stock_economico_${new Date().toISOString().split('T')[0]}.txt`;
+                
+                const url = URL.createObjectURL(blob);
+                const tempLink = document.createElement('a');
+                tempLink.href = url;
+                tempLink.download = fileName;
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                
+                document.body.removeChild(tempLink);
+                URL.revokeObjectURL(url);
+                showToast("Copia de seguridad descargada en tu equipo.", "success");
+            } catch (err) {
+                showToast("Error al exportar los datos locales.", "error");
+                console.error(err);
+            }
+        }
+
+        // Unifica la información del archivo de texto importado con la que ya se encuentra en pantalla
+        function processImportContent(fileText) {
+            let parsedItems = [];
+            let isJsonFormat = false;
+
+            try {
+                const dataObj = JSON.parse(fileText);
+                if (dataObj && Array.isArray(dataObj.products)) {
+                    parsedItems = dataObj.products;
+                    isJsonFormat = true;
+                } else if (Array.isArray(dataObj)) {
+                    parsedItems = dataObj;
+                    isJsonFormat = true;
+                }
+            } catch (jsonErr) {
+                isJsonFormat = false;
+            }
+
+            if (isJsonFormat) {
+                let added = 0;
+                parsedItems.forEach(loadedItem => {
+                    // Evita duplicar elementos basándose en la coincidencia exacta de nombre y fecha de vencimiento
+                    const exists = state.products.some(p => p.name.toLowerCase() === loadedItem.name.toLowerCase() && p.expiryDate === loadedItem.expiryDate);
+                    if (!exists) {
+                        if (!loadedItem.id) loadedItem.id = 'prod_' + Math.random().toString(36).substr(2, 9);
+                        state.products.push(loadedItem);
+                        added++;
+                    }
+                });
+                if (added > 0) {
+                    saveToLocalStorage();
+                    render();
+                    showToast(`Se unificó el archivo de texto. ${added} nuevos productos sumados al dispositivo.`, "success");
+                } else {
+                    showToast("No se encontraron productos nuevos para añadir.", "info");
+                }
+            } else {
+                // Si el archivo no es un JSON estructurado, lo procesa línea por línea como texto plano
+                parseAndAppendTextList(fileText, true);
+            }
+        }
+
+        // Controladores para la apertura y cierre del editor flotante
+        function openEditModal(id) {
+            const prod = state.products.find(p => p.id === id);
+            if (!prod) return;
+
+            document.getElementById('edit-id').value = prod.id;
+            document.getElementById('edit-name').value = prod.name;
+            document.getElementById('edit-date').value = prod.expiryDate;
+
+            const modal = document.getElementById('edit-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            }, 50);
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('edit-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Genera notificaciones visuales sofisticadas en lugar de utilizar el limitante "alert()"
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let typeColor = "bg-slate-800 text-white";
+            let iconHTML = `<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+            if (type === "success") {
+                typeColor = "bg-emerald-900 text-emerald-50 border border-emerald-800 shadow-lg shadow-emerald-950/25";
+                iconHTML = `<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            } else if (type === "warning") {
+                typeColor = "bg-amber-900 text-amber-50 border border-amber-800 shadow-lg shadow-amber-950/25";
+                iconHTML = `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+            } else if (type === "error") {
+                typeColor = "bg-rose-900 text-rose-50 border border-rose-800 shadow-lg shadow-rose-950/25";
+                iconHTML = `<svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            }
+
+            toast.className = `flex items-center gap-3 px-4 py-3.5 rounded-xl shadow-md transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto ${typeColor}`;
+            toast.innerHTML = `
+                <div class="shrink-0">${iconHTML}</div>
+                <div class="text-xs font-semibold flex-1">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-white/60 hover:text-white transition cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Cierre automático tras 5.5 segundos
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 5500);
+        }
+
+        // Bloque modal de confirmación personalizado en lugar de "confirm()"
+        function showActionConfirmToast(message, onConfirmCallback) {
+            const container = document.getElementById('toast-container');
+            const confirmBox = document.createElement('div');
+            
+            confirmBox.className = "bg-slate-900 text-slate-100 border border-slate-700 p-4 rounded-xl shadow-xl flex flex-col gap-3 pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0";
+            confirmBox.innerHTML = `
+                <p class="text-xs font-bold leading-relaxed text-slate-200">${message}</p>
+                <div class="flex gap-2 justify-end">
+                    <button id="confirm-btn-no" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-lg text-slate-400 transition cursor-pointer">Cancelar</button>
+                    <button id="confirm-btn-yes" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition cursor-pointer shadow-sm">Confirmar</button>
+                </div>
+            `;
+
+            container.appendChild(confirmBox);
+            
+            setTimeout(() => {
+                confirmBox.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            confirmBox.querySelector('#confirm-btn-no').addEventListener('click', () => {
+                confirmBox.remove();
+            });
+
+            confirmBox.querySelector('#confirm-btn-yes').addEventListener('click', () => {
+                onConfirmCallback();
+                confirmBox.remove();
+            });
+        }
+
+        // Formatea las fechas locales estéticamente
+        function formatLocalDate(dateObj) {
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            return dateObj.toLocaleDateString('es-ES', options);
+        }
+
+        // Sanitizador básico de seguridad para evitar inyecciones XSS
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+    </script>
+</body>
+</html>
